@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTree } from "./use-tree";
 
 type NestedCheckbox = {
   id: number;
@@ -67,65 +68,12 @@ const initialTree: NestedCheckbox = {
   ],
 };
 
-// Check/uncheck a node and all its descendants
-const setChildrenChecked = (
-  node: NestedCheckbox,
-  checked: boolean,
-): NestedCheckbox => ({
-  ...node,
-  isChecked: checked,
-  isIndeterminate: false,
-  children: node.children.map((child) => setChildrenChecked(child, checked)),
-});
-
-// Find the target node and update its ancestors
-const updateTree = (
-  node: NestedCheckbox,
-  targetId: number,
-  checked: boolean,
-): NestedCheckbox => {
-  if (node.id === targetId) {
-    return setChildrenChecked(node, checked);
-  }
-
-  let targetFound = false;
-
-  const updatedChildren = node.children.map((child) => {
-    const updatedChild = updateTree(child, targetId, checked);
-
-    if (updatedChild !== child) {
-      targetFound = true;
-    }
-
-    return updatedChild;
-  });
-
-  // Don't change branches that don't contain the target
-  if (!targetFound) {
-    return node;
-  }
-
-  const allChildrenChecked =
-    updatedChildren.length > 0 &&
-    updatedChildren.every((child) => child.isChecked && !child.isIndeterminate);
-
-  const someChildrenChecked = updatedChildren.some(
-    (child) => child.isChecked || child.isIndeterminate,
-  );
-
-  return {
-    ...node,
-    children: updatedChildren,
-    isChecked: allChildrenChecked,
-    isIndeterminate: !allChildrenChecked && someChildrenChecked,
-  };
-};
-
 export const NestedCheckboxes = () => {
   const [tree, setTree] = useState(initialTree);
+  const { updateNode } = useTree();
 
   const handleCheckboxClick = (id: number, checked: boolean) => {
-    setTree((previousTree) => updateTree(previousTree, id, checked));
+    setTree((previousTree) => updateNode(previousTree, id, checked));
   };
 
   return (
