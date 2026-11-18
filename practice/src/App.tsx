@@ -1,15 +1,12 @@
-import './App.css'
+import "./App.css";
+import { NestedCheckboxes } from "./nested-checkbox/nested-checkbox";
 
 function App() {
-
   return (
-   <div>
-    hello aditya
-    <div>
-      app
+    <div className="flex min-h-screen items-center justify-center">
+      <NestedCheckboxes />
     </div>
-   </div>
-  )
+  );
 }
 
-export default App
+export default App;
